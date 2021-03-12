@@ -2,6 +2,7 @@ import collections
 import re
 from typing import List, DefaultDict, Dict, FrozenSet, Tuple, Iterator, Set
 
+from randovania.cython_graph import cgraph
 from randovania.game_description.assignment import PickupTarget
 from randovania.game_description.game_description import GameDescription
 from randovania.game_description.resources.logbook_asset import LogbookAsset
@@ -44,7 +45,9 @@ class PlayerState:
                  ):
         self.index = index
         self.game = game
-        self.reach = advance_reach_with_possible_unsafe_resources(reach_with_all_safe_resources(game, initial_state))
+
+        optimized = cgraph.optimize_game(game, initial_state.patches)
+        self.reach = advance_reach_with_possible_unsafe_resources(reach_with_all_safe_resources(optimized, initial_state))
         self.pickups_left = pickups_left
         self.configuration = configuration
 
